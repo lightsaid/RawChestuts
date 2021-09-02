@@ -1,0 +1,28 @@
+/* 定义根元素样式 */
+:root {
+  /* Color */
+  --color-default: #2db7f5;
+  --color-success: #19be6b;
+  --color-cancel: #ed4014;
+
+  /* Border */
+  --border-default: 1px solid #ced4da;
+
+  /* 重置所有元素为IE盒模型 */
+  box-sizing: border-box;
+
+	/* 默认字体大小 */
+	font-size: 0.875em;
+ 
+}
+
+
+*,
+::before,
+::after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+}
