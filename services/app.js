@@ -1,23 +1,61 @@
-~function(){
-    function App(){
+~(function () {
+  function App() {
+    this.run = function () {
+      try {
+        const args = [].slice.call(arguments)
+        const fn = args.shift()
+        fn.apply(this, args)
+      } catch (err) {
+        console.log(err)
+      }
+    }
+  }
+  function Foo() {
+    this.foo = "===foo==="
+  }
+  Foo.prototype.print = function () {
+    console.log(this.foo)
+  }
+  App.prototype = { Message: new Message(), Foo: new Foo() }
+  Object.defineProperty(App.prototype, "constructor", {
+    enumerable: false,
+    value: App,
+    writable: true,
+  })
 
-    }
-    function Foo() {
-        this.foo = "===foo==="
-    }
-    Foo.prototype.print = function(){
-        console.log(this.foo)
-    }
-    App.prototype = { Message: new Message(), Foo: new Foo() }
-    Object.defineProperty(App.prototype, "constructor", { 
-        enumerable: false, 
-        value: App, 
-        writable: true 
-    })
+  var app = new App()
+  app.Foo.print()
+  function done() {
+    console.log("~~done~~")
+  }
+  let instance = app.Message.success({
+    duration: 2000,
+    content: "成功~",
+    onClose: done,
+  })
+  // app.Message.close(instance, done)
 
-    var app = new App()
-    app.Foo.print()
-    let dom = app.Message.success()
-    app.Message.error();
-    dom.style.display = "none"
-}(window)
+  // console.log(typeof instance)
+
+  const job = {
+    name: "zhansan",
+    work: function (slogan) {
+      //    try{
+      //     console.log(this.name + " ing...")
+      //     throw new Error("出毛病了。。。")
+      //    }catch(err){
+      //        console.log(err)
+      //    }
+      console.log(this.name + slogan)
+      throw new Error("出毛病了。。。")
+    },
+  }
+
+  //    job.work(' ing...')
+  app.run.call(job, job.work, " working...")
+  app.run.apply(job, [job.work, " ing..."])
+
+  console.log("=====如果不 try catch 后续不会执行=====")
+
+  // app.Message.error();
+})(window)
