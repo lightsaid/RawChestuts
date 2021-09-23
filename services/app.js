@@ -33,6 +33,16 @@
         content: "成功~",
         onClose: done,
     });
+    var instanc2 = app.Message.success({
+        duration: 3000,
+        content: "成功~",
+        onClose: done,
+    });
+    var instance3 = app.Message.success({
+        duration: 4000,
+        content: "成功~",
+        onClose: done,
+    });
     // app.Message.close(instance, done)
     // console.log(typeof instance)
     var job = {
