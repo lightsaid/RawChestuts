@@ -33,6 +33,8 @@ var Message = /** @class */ (function () {
         if (Message.container === null) {
             this.appendContainer();
         }
+        this.instance = this.created();
+        this.show();
     }
     Message.prototype.appendContainer = function () {
         Message.container = document.createElement("div");
@@ -41,7 +43,6 @@ var Message = /** @class */ (function () {
     };
     // 创建实例
     Message.prototype.created = function () {
-        this.instance = null;
         this.instance = document.createElement("div");
         var icon = document.createElement("span");
         var content = document.createElement("span");
@@ -50,22 +51,27 @@ var Message = /** @class */ (function () {
         content.textContent = this.content;
         this.instance.append(icon);
         this.instance.append(content);
-        this.show();
         return this.instance;
-    };
-    Message.prototype.close = function () {
-        var _this = this;
-        this.timer = setTimeout(function () {
-            Message.container.removeChild(_this.instance);
-            _this.onClose && _this.onClose();
-            clearTimeout(_this.timer);
-        }, this.duration);
     };
     Message.prototype.show = function () {
         this.instance = this.created();
         Message.container.append(this.instance);
-        this.close();
+        this.delayClose();
         return this.instance;
+    };
+    Message.prototype.close = function () {
+        Message.container.removeChild(this.instance);
+        this.instance = null;
+    };
+    Message.prototype.delayClose = function () {
+        var _this = this;
+        this.timer = setTimeout(function () {
+            if (_this.instance) {
+                Message.container.removeChild(_this.instance);
+                _this.onClose && _this.onClose();
+                clearTimeout(_this.timer);
+            }
+        }, this.duration);
     };
     Message.container = null; // 容器
     return Message;

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登陆</title>
+    <title></title>
     <link rel="stylesheet" href="../assets/fonts/iconfont.css">
     <link rel="stylesheet" href="../styles/root.css">
     
@@ -18,10 +18,13 @@
 </head>
 <body>
     <main>
-       
+       <button id="register">register</button>
+       <button id="signin">signin</button>
     </main>
 
-    <script src="../initial/app.js"></script>  
+    <!-- 指定 type="module", 解决 Cannot use import statement outside a module 报错 -->
+    <!-- <script type="module" src="../libs/initial/app.js"></script> -->
+    <script type="module" src="../libs/service/user.js"></script>
 
 </body>
 </html>

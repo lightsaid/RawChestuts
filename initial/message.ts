@@ -12,7 +12,7 @@ interface IceDivInstance extends HTMLDivElement{
 
 }
 
-interface IceMessageConfig {
+export interface IceMessageConfig {
     content: string
     type?: MessageType
     duration?: number
@@ -20,13 +20,13 @@ interface IceMessageConfig {
 }
 
 export default class Message {
-    instance: IceDivInstance
-    content: string
-    timer: number
-    duration?: number
-    type?: MessageType
-    icon: MessageIcon
-    onClose?:() => void
+    private instance: IceDivInstance
+    private content: string
+    private timer: number
+    private duration?: number
+    private type?: MessageType
+    private icon: MessageIcon
+    private onClose?:() => void
     private static container: HTMLDivElement = null  // 容器
     constructor(config: IceMessageConfig) {
         const { content, duration, type, onClose} = config
@@ -52,11 +52,12 @@ export default class Message {
                 this.icon = MessageIcon.Success
                 break;
         }
-
         if(Message.container === null){
             this.appendContainer()
         }
 
+        this.instance = this.created()
+        this.show()
     }
 
     private appendContainer() {
@@ -66,8 +67,7 @@ export default class Message {
     }
 
     // 创建实例
-    created(): IceDivInstance{
-        this.instance = null
+    private created(): IceDivInstance{
         this.instance = document.createElement("div")
         var icon = document.createElement("span")
         var content = document.createElement("span")
@@ -76,25 +76,29 @@ export default class Message {
         content.textContent = this.content
         this.instance.append(icon)
         this.instance.append(content)
+        return this.instance
+    }
 
-        this.show()
-
+    private show(): IceDivInstance{
+        this.instance = this.created()
+        Message.container.append(this.instance)
+        this.delayClose()
         return this.instance
     }
 
     close(){
-        this.timer = setTimeout(()=>{
-            Message.container.removeChild(this.instance)
-            this.onClose && this.onClose()
-            clearTimeout(this.timer)
-        }, this.duration)
+        Message.container.removeChild(this.instance)
+        this.instance = null
     }
 
-    show(): IceDivInstance{
-        this.instance = this.created()
-        Message.container.append(this.instance)
-        this.close()
-        return this.instance
+    private delayClose(){
+        this.timer = setTimeout(()=>{
+            if(this.instance){
+                Message.container.removeChild(this.instance)
+                this.onClose && this.onClose()
+                clearTimeout(this.timer)
+            }
+        }, this.duration)
     }
 }
 
