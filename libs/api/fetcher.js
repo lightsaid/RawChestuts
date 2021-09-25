@@ -46,6 +46,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import appConfig from '../initial/config.js';
+import { GlobalProps } from '../enums/index.js';
 export var HttpMethods;
 (function (HttpMethods) {
     HttpMethods["GET"] = "GET";
@@ -66,7 +67,24 @@ var Request = /** @class */ (function () {
     }
     Request.prototype.get = function (url, options) {
         if (options === void 0) { options = {}; }
-        return fetch("" + this.baseUrl + url, __assign({ method: HttpMethods.GET }, Object.assign(this.config, options)));
+        return __awaiter(this, void 0, void 0, function () {
+            var req, response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch("" + this.baseUrl + url, __assign({ method: HttpMethods.GET }, Object.assign(this.config, options)))];
+                    case 1:
+                        req = _a.sent();
+                        response = req.json();
+                        // TODO: 通用异常处理
+                        response.then(function (res) {
+                            if (res.code !== HttpStatusCode.OK) {
+                                console.error(res.msg, res.errInfo);
+                            }
+                        });
+                        return [2 /*return*/, response];
+                }
+            });
+        });
     };
     Request.prototype.post = function (url, options) {
         if (options === void 0) { options = {}; }
@@ -94,5 +112,5 @@ var Request = /** @class */ (function () {
 // 根据基础路径不同可以创建不同的实例
 // 创建一个基础实例
 export var fetcher = new Request(appConfig.baseUrl, {
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem(GlobalProps.Token) }
 });

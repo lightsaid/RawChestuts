@@ -14,15 +14,18 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import { UserServerApi } from '../api/user.js';
+import { GlobalProps } from '../enums/index.js';
 var UserServer = /** @class */ (function (_super) {
     __extends(UserServer, _super);
     function UserServer() {
-        var _a, _b;
+        var _a, _b, _c;
         var _this = _super.call(this) || this;
         _this.registerBtn = document.getElementById("register");
         _this.signinBtn = document.getElementById("signin");
+        _this.modifyBtn = document.getElementById("modify");
         (_a = _this.registerBtn) === null || _a === void 0 ? void 0 : _a.addEventListener('click', _this.handleResister.bind(_this), false);
         (_b = _this.signinBtn) === null || _b === void 0 ? void 0 : _b.addEventListener('click', _this.handleSignin.bind(_this), false);
+        (_c = _this.modifyBtn) === null || _c === void 0 ? void 0 : _c.addEventListener('click', _this.handleModify.bind(_this), false);
         return _this;
     }
     UserServer.prototype.handleResister = function () {
@@ -32,13 +35,18 @@ var UserServer = /** @class */ (function (_super) {
         });
     };
     UserServer.prototype.handleSignin = function () {
-        var response = this.signin({ username: 'yyds', password: '123456' });
+        var response = this.signin({ username: 'yyds', password: '1234561' });
         response.then(function (res) {
-            res.data.userInfo.id;
+            debugger;
+            localStorage.setItem(GlobalProps.Userinfo, JSON.stringify(res.data.userinfo));
+            localStorage.setItem(GlobalProps.Token, "Bearer " + res.data.token);
         });
     };
     UserServer.prototype.handleSignout = function () {
         console.log(111);
+    };
+    UserServer.prototype.handleModify = function () {
+        var response = this.modify({ username: 'xzz', avatar: 'http://localhost:9999/static/default/avatar.png' });
     };
     return UserServer;
 }(UserServerApi));

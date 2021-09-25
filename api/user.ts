@@ -11,9 +11,14 @@ export interface SigninDto{
     password: string
 }
 
+export interface ModifyUserDto{
+    username: string 
+    avatar: string
+}
+
 type ResponseDto = {}
 interface SigninResponseDto extends ResponseDto{
-    userInfo: {
+    userinfo: {
         id: string, 
         username: string, 
         avatar: string
@@ -21,24 +26,33 @@ interface SigninResponseDto extends ResponseDto{
     token: string
 }
 
-
-interface IceUserServerApi{
+interface IceUserServerApi {
     register: (dto: RegisterDto) => Promise<ResponseProps<ResponseDto>>
     signin: (dto: SigninDto) => Promise<ResponseProps<SigninResponseDto>>
-    modify: () => void
+    modify: (dto: ModifyUserDto) => Promise<ResponseProps<ResponseDto>>
 }
+
 export class UserServerApi implements IceUserServerApi{
+
     register(dto: RegisterDto){
         const response = fetcher.post<ResponseDto>('/api/user/register', { body: JSON.stringify(dto) })
         response.then(res=>{
+            // 做些什么
         })
         return response
     }
     signin(dto: SigninDto){
         const response = fetcher.post<SigninResponseDto>('/api/user/login', { body: JSON.stringify(dto) })
         response.then(res=>{
+            // 做些什么
         })
         return response
     }
-    modify(){}
+    modify(dto: ModifyUserDto){
+        const response = fetcher.post<ResponseDto>('/api/user/update', { body: JSON.stringify(dto) })
+        response.then(res=>{
+            // 做些什么
+        })
+        return response
+    }
 }

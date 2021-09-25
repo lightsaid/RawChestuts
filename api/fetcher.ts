@@ -1,4 +1,5 @@
 import appConfig  from '../initial/config.js'
+import { GlobalProps } from '../enums/index.js'
 
 export enum HttpMethods {
     GET = 'GET',
@@ -26,15 +27,9 @@ class Request{
         this.baseUrl = baseUrl
         this.config = config
     }
-    get(url: string, options = {}): Promise<Response> {
-        return fetch(`${this.baseUrl}${url}`, {
-            method: HttpMethods.GET,
-            ...Object.assign(this.config, options)
-        });
-    }
-    async post<T>(url: string, options = {}): Promise<ResponseProps<T>> {
+    async get<T>(url: string, options = {}): Promise<ResponseProps<T>> {
         const req = await fetch(`${this.baseUrl}${url}`, {
-            method: HttpMethods.POST,
+            method: HttpMethods.GET,
             ...Object.assign(this.config, options)
         })
         const response = req.json() as Promise<ResponseProps<T>> 
@@ -46,15 +41,27 @@ class Request{
         })
         return response
     }
+    async post<T>(url: string, options = {}): Promise<ResponseProps<T>> {
+        const req = await fetch(`${this.baseUrl}${url}`, {
+            method: HttpMethods.POST,
+            ...Object.assign(this.config, options)
+        })
+        const response = req.json() as Promise<ResponseProps<T>>
+        // TODO: 通用异常处理
+        response.then(res=>{
+            if(res.code !== HttpStatusCode.OK){
+                console.error(res.msg, res.errInfo)
+            }
+        })
+        return response
+    }
 }
 
-
 // 根据基础路径不同可以创建不同的实例
-
 // 创建一个基础实例
 export const fetcher = new Request(
-    appConfig.baseUrl, 
+    appConfig.baseUrl,
     {
-        headers: {'Content-Type': 'application/json' }
+        headers: {'Content-Type': 'application/json', 'Authorization': localStorage.getItem(GlobalProps.Token)}
     }
 )
