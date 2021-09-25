@@ -13,14 +13,17 @@ class UserServer extends UserServerApi{
     handleResister(){
         const response = this.register({username:'yyds', password:'123456'} as RegisterDto)
         response.then(result => {
-            console.log("result=>>>", result)
+            console.log("result=>>>", result.data)
         })
     }
     handleSignin(){
-        const response =this.signin({username:'yyds', password:'123456'} as SigninDto)
+        const response = this.signin({username:'yyds', password:'123456'} as SigninDto)
+        response.then(res=>{
+            res.data.userInfo.id
+        })
     }
     handleSignout(){
-       
+       console.log(111)
     }
 }
 

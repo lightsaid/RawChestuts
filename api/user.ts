@@ -1,4 +1,4 @@
-import { fetcher } from './fetcher.js'
+import { fetcher, ResponseProps } from './fetcher.js'
 
 export interface RegisterDto{
     username: string
@@ -11,20 +11,31 @@ export interface SigninDto{
     password: string
 }
 
+type ResponseDto = {}
+interface SigninResponseDto extends ResponseDto{
+    userInfo: {
+        id: string, 
+        username: string, 
+        avatar: string
+    },
+    token: string
+}
+
+
 interface IceUserServerApi{
-    register: (dto: RegisterDto) => Promise<any>
-    signin: (dto: SigninDto) => Promise<any>
+    register: (dto: RegisterDto) => Promise<ResponseProps<ResponseDto>>
+    signin: (dto: SigninDto) => Promise<ResponseProps<SigninResponseDto>>
     modify: () => void
 }
 export class UserServerApi implements IceUserServerApi{
     register(dto: RegisterDto){
-        const response = fetcher.post('/api/user/register', { body: JSON.stringify(dto) })
+        const response = fetcher.post<ResponseDto>('/api/user/register', { body: JSON.stringify(dto) })
         response.then(res=>{
         })
         return response
     }
     signin(dto: SigninDto){
-        const response = fetcher.post('/api/user/login', { body: JSON.stringify(dto) })
+        const response = fetcher.post<SigninResponseDto>('/api/user/login', { body: JSON.stringify(dto) })
         response.then(res=>{
         })
         return response

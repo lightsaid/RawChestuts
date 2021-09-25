@@ -20,20 +20,21 @@ export interface IceMessageConfig {
 }
 
 export default class Message {
-    private instance: IceDivInstance
+    private instance: IceDivInstance | null
     private content: string
-    private timer: number
+    private timer: number | null
     private duration?: number
     private type?: MessageType
     private icon: MessageIcon
     private onClose?:() => void
-    private static container: HTMLDivElement = null  // 容器
+    private static container: HTMLDivElement// 容器
     constructor(config: IceMessageConfig) {
         const { content, duration, type, onClose} = config
         this.duration = duration || 3000
         this.content = content
         this.type = type || 'success'
         this.onClose = onClose
+        this.timer = null
 
         switch (this.type) {
             case 'error':
@@ -87,8 +88,10 @@ export default class Message {
     }
 
     close(){
-        Message.container.removeChild(this.instance)
-        this.instance = null
+        if(this.instance){
+            Message.container.removeChild(this.instance)
+            this.instance = null
+        }
     }
 
     private delayClose(){
@@ -96,7 +99,7 @@ export default class Message {
             if(this.instance){
                 Message.container.removeChild(this.instance)
                 this.onClose && this.onClose()
-                clearTimeout(this.timer)
+                clearTimeout(this.timer!)
             }
         }, this.duration)
     }

@@ -13,7 +13,6 @@ class AppConfig{
         }else{
             this.baseUrl = 'http://localhost:9999'
         }
-
     }
 
     static getInstance(env: EnvTypes){

@@ -12,9 +12,9 @@ export enum HttpStatusCode {
     Unknown = 110
 }
 
-export interface ResponseProps {
+export interface ResponseProps<T> {
     code: number
-    data: unknown
+    data: T
     errInfo: string
     msg: string
 }
@@ -22,7 +22,7 @@ export interface ResponseProps {
 class Request{
     private baseUrl: string
     private config: RequestInit
-    constructor(baseUrl: string, config = {}){
+    constructor(baseUrl: string, config = {}) {
         this.baseUrl = baseUrl
         this.config = config
     }
@@ -32,12 +32,12 @@ class Request{
             ...Object.assign(this.config, options)
         });
     }
-    async post(url: string, options = {}): Promise<ResponseProps> {
+    async post<T>(url: string, options = {}): Promise<ResponseProps<T>> {
         const req = await fetch(`${this.baseUrl}${url}`, {
             method: HttpMethods.POST,
             ...Object.assign(this.config, options)
         })
-        const response = req.json() as Promise<ResponseProps>
+        const response = req.json() as Promise<ResponseProps<T>> 
         // TODO: 通用异常处理
         response.then(res=>{
             if(res.code !== HttpStatusCode.OK){
@@ -48,6 +48,7 @@ class Request{
     }
 }
 
+
 // 根据基础路径不同可以创建不同的实例
 
 // 创建一个基础实例
@@ -57,4 +58,3 @@ export const fetcher = new Request(
         headers: {'Content-Type': 'application/json' }
     }
 )
-
