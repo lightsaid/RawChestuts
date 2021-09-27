@@ -27,7 +27,7 @@ export default class Message {
     private type?: MessageType
     private icon: MessageIcon
     private onClose?:() => void
-    private static container: HTMLDivElement// 容器
+    private static container: HTMLDivElement | undefined// 容器
     constructor(config: IceMessageConfig) {
         const { content, duration, type, onClose} = config
         this.duration = duration || 3000
@@ -53,7 +53,7 @@ export default class Message {
                 this.icon = MessageIcon.Success
                 break;
         }
-        if(Message.container === null){
+        if(Message.container===undefined){
             this.appendContainer()
         }
 
@@ -82,14 +82,14 @@ export default class Message {
 
     private show(): IceDivInstance{
         this.instance = this.created()
-        Message.container.append(this.instance)
+        Message.container && Message.container.append(this.instance)
         this.delayClose()
         return this.instance
     }
 
     close(){
         if(this.instance){
-            Message.container.removeChild(this.instance)
+            Message.container && Message.container.removeChild(this.instance)
             this.instance = null
         }
     }
@@ -97,7 +97,7 @@ export default class Message {
     private delayClose(){
         this.timer = setTimeout(()=>{
             if(this.instance){
-                Message.container.removeChild(this.instance)
+                Message.container && Message.container.removeChild(this.instance)
                 this.onClose && this.onClose()
                 clearTimeout(this.timer!)
             }

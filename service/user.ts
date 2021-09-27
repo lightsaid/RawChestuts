@@ -1,5 +1,5 @@
-import { UserServerApi, RegisterDto, SigninDto } from '../api/user.js'
-import { GlobalProps } from '../enums/index.js'
+import { UserServerApi, RegisterDto, SigninDto, SigninResponseDto } from '../api/user.js'
+import { StorageKey } from '../enums/index.js'
 
 class UserServer extends UserServerApi{
     registerBtn: HTMLElement | null
@@ -22,11 +22,12 @@ class UserServer extends UserServerApi{
         })
     }
     handleSignin(){
-        const response = this.signin({username:'yyds', password:'1234561'} as SigninDto)
+        const response = this.signin({username:'yyd', password:'123456'} as SigninDto, <SigninResponseDto>(data: SigninResponseDto)=>{
+            console.log("===handleSignin===", data)
+        })
         response.then(res=>{
-            debugger
-            localStorage.setItem(GlobalProps.Userinfo, JSON.stringify(res.data.userinfo))
-            localStorage.setItem(GlobalProps.Token, `Bearer ${res.data.token}`)
+            localStorage.setItem(StorageKey.Userinfo, JSON.stringify(res.data))
+            localStorage.setItem(StorageKey.Token, `Bearer ${res.data}`)
         })
     }
     handleSignout(){

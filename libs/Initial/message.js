@@ -13,6 +13,7 @@ var Message = /** @class */ (function () {
         this.content = content;
         this.type = type || 'success';
         this.onClose = onClose;
+        this.timer = null;
         switch (this.type) {
             case 'error':
                 this.icon = MessageIcon.Error;
@@ -30,7 +31,7 @@ var Message = /** @class */ (function () {
                 this.icon = MessageIcon.Success;
                 break;
         }
-        if (Message.container === null) {
+        if (Message.container === undefined) {
             this.appendContainer();
         }
         this.instance = this.created();
@@ -55,25 +56,26 @@ var Message = /** @class */ (function () {
     };
     Message.prototype.show = function () {
         this.instance = this.created();
-        Message.container.append(this.instance);
+        Message.container && Message.container.append(this.instance);
         this.delayClose();
         return this.instance;
     };
     Message.prototype.close = function () {
-        Message.container.removeChild(this.instance);
-        this.instance = null;
+        if (this.instance) {
+            Message.container && Message.container.removeChild(this.instance);
+            this.instance = null;
+        }
     };
     Message.prototype.delayClose = function () {
         var _this = this;
         this.timer = setTimeout(function () {
             if (_this.instance) {
-                Message.container.removeChild(_this.instance);
+                Message.container && Message.container.removeChild(_this.instance);
                 _this.onClose && _this.onClose();
                 clearTimeout(_this.timer);
             }
         }, this.duration);
     };
-    Message.container = null; // 容器
     return Message;
 }());
 export default Message;

@@ -1,4 +1,4 @@
-import { fetcher, ResponseProps } from './fetcher.js'
+import { fetcher } from './fetcher.js'
 
 export interface RegisterDto{
     username: string
@@ -17,7 +17,7 @@ export interface ModifyUserDto{
 }
 
 type ResponseDto = {}
-interface SigninResponseDto extends ResponseDto{
+export interface SigninResponseDto extends ResponseDto{
     userinfo: {
         id: string, 
         username: string, 
@@ -26,30 +26,35 @@ interface SigninResponseDto extends ResponseDto{
     token: string
 }
 
+
 interface IceUserServerApi {
     register: (dto: RegisterDto) => Promise<ResponseProps<ResponseDto>>
-    signin: (dto: SigninDto) => Promise<ResponseProps<SigninResponseDto>>
+    signin: (dto: SigninDto, done?: <SigninResponseDto>(data: SigninResponseDto)=>void) => Promise<ResponseProps<SigninResponseDto>>
     modify: (dto: ModifyUserDto) => Promise<ResponseProps<ResponseDto>>
 }
 
 export class UserServerApi implements IceUserServerApi{
+    constructor(){
 
+    }
     register(dto: RegisterDto){
-        const response = fetcher.post<ResponseDto>('/api/user/register', { body: JSON.stringify(dto) })
+        const response = fetcher.post<ResponseProps<ResponseDto>>('/api/user/register', { body: JSON.stringify(dto), hideErrMsg: false, hideSuccessMsg:false})
         response.then(res=>{
             // 做些什么
         })
         return response
     }
-    signin(dto: SigninDto){
-        const response = fetcher.post<SigninResponseDto>('/api/user/login', { body: JSON.stringify(dto) })
+
+    signin(dto: SigninDto, done?: <SigninResponseDto>(data: SigninResponseDto)=>void){
+        const response = fetcher.post<ResponseProps<SigninResponseDto>>('/api/user/login', { body: JSON.stringify(dto) }, done)
         response.then(res=>{
             // 做些什么
         })
         return response
     }
+
     modify(dto: ModifyUserDto){
-        const response = fetcher.post<ResponseDto>('/api/user/update', { body: JSON.stringify(dto) })
+        const response = fetcher.post<ResponseProps<ResponseDto>>('/api/user/update', { body: JSON.stringify(dto) })
         response.then(res=>{
             // 做些什么
         })

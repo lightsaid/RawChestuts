@@ -14,7 +14,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import { UserServerApi } from '../api/user.js';
-import { GlobalProps } from '../enums/index.js';
+import { StorageKey } from '../enums/index.js';
 var UserServer = /** @class */ (function (_super) {
     __extends(UserServer, _super);
     function UserServer() {
@@ -35,11 +35,12 @@ var UserServer = /** @class */ (function (_super) {
         });
     };
     UserServer.prototype.handleSignin = function () {
-        var response = this.signin({ username: 'yyds', password: '1234561' });
+        var response = this.signin({ username: 'yyd', password: '123456' }, function (data) {
+            console.log("===handleSignin===", data);
+        });
         response.then(function (res) {
-            debugger;
-            localStorage.setItem(GlobalProps.Userinfo, JSON.stringify(res.data.userinfo));
-            localStorage.setItem(GlobalProps.Token, "Bearer " + res.data.token);
+            localStorage.setItem(StorageKey.Userinfo, JSON.stringify(res.data));
+            localStorage.setItem(StorageKey.Token, "Bearer " + res.data);
         });
     };
     UserServer.prototype.handleSignout = function () {

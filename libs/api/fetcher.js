@@ -46,61 +46,52 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import appConfig from '../initial/config.js';
-import { GlobalProps } from '../enums/index.js';
+import { StorageKey, HttpStatusCode } from '../enums/index.js';
+import Message from '../initial/message.js';
 export var HttpMethods;
 (function (HttpMethods) {
     HttpMethods["GET"] = "GET";
     HttpMethods["POST"] = "POST";
 })(HttpMethods || (HttpMethods = {}));
-export var HttpStatusCode;
-(function (HttpStatusCode) {
-    HttpStatusCode[HttpStatusCode["OK"] = 200] = "OK";
-    HttpStatusCode[HttpStatusCode["BadRequest"] = 400] = "BadRequest";
-    HttpStatusCode[HttpStatusCode["Unauthorized"] = 401] = "Unauthorized";
-    HttpStatusCode[HttpStatusCode["Unknown"] = 110] = "Unknown";
-})(HttpStatusCode || (HttpStatusCode = {}));
 var Request = /** @class */ (function () {
-    function Request(baseUrl, config) {
+    function Request(baseUrl, config, responseHandler) {
         if (config === void 0) { config = {}; }
         this.baseUrl = baseUrl;
         this.config = config;
+        this.responseHandler = responseHandler;
     }
-    Request.prototype.get = function (url, options) {
+    Request.prototype.get = function (url, options, done) {
         if (options === void 0) { options = {}; }
         return __awaiter(this, void 0, void 0, function () {
             var req, response;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, fetch("" + this.baseUrl + url, __assign({ method: HttpMethods.GET }, Object.assign(this.config, options)))];
                     case 1:
                         req = _a.sent();
                         response = req.json();
-                        // TODO: 通用异常处理
                         response.then(function (res) {
-                            if (res.code !== HttpStatusCode.OK) {
-                                console.error(res.msg, res.errInfo);
-                            }
+                            _this.responseHandler && _this.responseHandler(res, options, done);
                         });
                         return [2 /*return*/, response];
                 }
             });
         });
     };
-    Request.prototype.post = function (url, options) {
+    Request.prototype.post = function (url, options, done) {
         if (options === void 0) { options = {}; }
         return __awaiter(this, void 0, void 0, function () {
             var req, response;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, fetch("" + this.baseUrl + url, __assign({ method: HttpMethods.POST }, Object.assign(this.config, options)))];
                     case 1:
                         req = _a.sent();
                         response = req.json();
-                        // TODO: 通用异常处理
                         response.then(function (res) {
-                            if (res.code !== HttpStatusCode.OK) {
-                                console.error(res.msg, res.errInfo);
-                            }
+                            _this.responseHandler && _this.responseHandler(res, options, done);
                         });
                         return [2 /*return*/, response];
                 }
@@ -109,8 +100,25 @@ var Request = /** @class */ (function () {
     };
     return Request;
 }());
+// 不同的服务器，可能有不同的错误处理方式
+var fetcherResponse = function (res, config, done) {
+    if (res.code !== HttpStatusCode.OK) {
+        // 通用异常处理
+        if (!(config === null || config === void 0 ? void 0 : config.hideErrMsg)) {
+            new Message({ content: res.msg, type: 'error', duration: 2000 });
+        }
+    }
+    if (res.code === HttpStatusCode.Unauthorized) {
+        // 跳转到登录页/主页
+    }
+    if (res.code === HttpStatusCode.OK) {
+        if (!config.hideSuccessMsg) {
+            new Message({ content: res.msg, type: 'success', duration: 2000 });
+        }
+        done && done(res.data);
+    }
+};
 // 根据基础路径不同可以创建不同的实例
-// 创建一个基础实例
 export var fetcher = new Request(appConfig.baseUrl, {
-    headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem(GlobalProps.Token) }
-});
+    headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem(StorageKey.Token) }
+}, fetcherResponse);
