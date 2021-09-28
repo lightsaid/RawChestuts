@@ -6,44 +6,54 @@ export enum HttpMethods {
     GET = 'GET',
     POST = 'POST'
 }
-
 class Request {
+    public aa = 10
     private baseUrl: string
     private config: RequestInit
+    private readonly timeout: number
     private readonly responseHandler: Function
-    constructor(baseUrl: string, config = {}, responseHandler: Function) {
+    constructor(baseUrl: string, config = {}, timeout: number, responseHandler: Function) {
         this.baseUrl = baseUrl
         this.config = config
+        this.timeout = timeout
         this.responseHandler = responseHandler
     }
 
-    async get<T>(url: string, options = {} as fetchOptio & RequestInit, done?: <K>(data: K)=> void): Promise<T> {
-        const req = await fetch(`${this.baseUrl}${url}`, {
-            method: HttpMethods.GET,
-            ...Object.assign(this.config, options)
-        })
-        const response = req.json() as Promise<T>
-        response.then(res=>{
-            this.responseHandler && this.responseHandler(res, options, done)
-        })
-        return response
-    }
-
-    async post<T>(url: string, options = {} as fetchOptio & RequestInit, done?: <K>(data: K)=> void): Promise<T> {
-        const req = await fetch(`${this.baseUrl}${url}`, {
+    send<T>(url: string, method: HttpMethods, options = {} as fetchOptio & RequestInit, done?: <K>(data: K)=> void): Promise<T> {
+        const controller = new AbortController();
+        const signal = controller.signal;
+        const req = fetch(`${this.baseUrl}${url}`, {
             method: HttpMethods.POST,
-            ...Object.assign(this.config, options)
+            ...Object.assign(this.config, options, {signal})
         })
-        const response = req.json() as Promise<T>
-        response.then(res=>{
-            this.responseHandler && this.responseHandler(res, options, done)
-        })
-        return response
+        const sleep = new Promise<Response>((resolve) => {
+            const result:ResponseProps<{}> = {
+                code: HttpStatusCode.Timeout,
+                msg: '请求超时',
+                data: {},
+                errInfo: ''
+            } 
+            let val = new Response(JSON.stringify(result))
+            setTimeout(resolve, this.timeout, val);
+        });
+        return Promise.race([req, sleep]).then((resp) => {
+            const response = resp.json()
+            response.then(res=>{
+                this.responseHandler && this.responseHandler(res, options, controller, done)
+            })
+            return response
+        });
+    }
+    get<T>(url: string, options = {} as fetchOptio & RequestInit, done?: <K>(data: K)=> void): Promise<T> {
+        return this.send<T>(url, HttpMethods.GET, options, done)
+    }
+    post<T>(url: string, options = {} as fetchOptio & RequestInit, done?: <K>(data: K)=> void): Promise<T> {
+        return this.send<T>(url, HttpMethods.POST, options, done)
     }
 }
 
 // 不同的服务器，可能有不同的错误处理方式
-const fetcherResponse = <T>(res: ResponseProps<T>, config:fetchOptio, done?: <K>(data:K) => void) => {
+const fetcherResponse = <T>(res: ResponseProps<T>, config:fetchOptio, controller:AbortController, done?: <K>(data:K) => void) => {
     if(res.code !== HttpStatusCode.OK){
         // 通用异常处理
         if(!config?.hideErrMsg){
@@ -55,9 +65,12 @@ const fetcherResponse = <T>(res: ResponseProps<T>, config:fetchOptio, done?: <K>
     }
     if(res.code === HttpStatusCode.OK){
         if(!config.hideSuccessMsg){
-            new Message({content: res.msg, type: 'success', duration:2000})
+            new Message({content: res.msg, type: 'success', duration: 2000})
         }
         done && done(res.data)
+    }
+    if(res.code === HttpStatusCode.Timeout){
+        controller.abort()
     }
 }
 
@@ -67,5 +80,7 @@ export const fetcher = new Request(
     {
         headers: {'Content-Type': 'application/json', 'Authorization': localStorage.getItem(StorageKey.Token)}
     },
+    1000 * 10,
     fetcherResponse
 )
+

@@ -73,12 +73,12 @@ class AppLogger {
 }
 
 // 测试
-const createErr = (a: number, b: string, c: boolean) => {
-    console.log(a, b, c)
-    throw new Error("人造错误");
-}
-let appLog = new AppLogger('INFO')
-appLog.setLogLevel("ERROR")
-appLog.tryErr(createErr, 1, 'b', true)
+// const createErr = (a: number, b: string, c: boolean) => {
+//     console.log(a, b, c)
+//     throw new Error("人造错误");
+// }
+// let appLog = new AppLogger('INFO')
+// appLog.setLogLevel("ERROR")
+// appLog.tryErr(createErr, 1, 'b', true)
 
 export default new AppLogger()

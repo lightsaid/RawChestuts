@@ -9,4 +9,5 @@ export var HttpStatusCode;
     HttpStatusCode[HttpStatusCode["BadRequest"] = 400] = "BadRequest";
     HttpStatusCode[HttpStatusCode["Unauthorized"] = 401] = "Unauthorized";
     HttpStatusCode[HttpStatusCode["Unknown"] = 110] = "Unknown";
+    HttpStatusCode[HttpStatusCode["Timeout"] = 504] = "Timeout";
 })(HttpStatusCode || (HttpStatusCode = {}));

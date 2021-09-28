@@ -30,8 +30,8 @@ var UserServer = /** @class */ (function (_super) {
     }
     UserServer.prototype.handleResister = function () {
         var response = this.register({ username: 'yyds', password: '123456' });
-        response.then(function (result) {
-            console.log("result=>>>", result.data);
+        response.then(function (res) {
+            console.log("result=>>>", res.data);
         });
     };
     UserServer.prototype.handleSignin = function () {
