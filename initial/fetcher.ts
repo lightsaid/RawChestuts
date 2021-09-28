@@ -1,6 +1,6 @@
-import appConfig  from '../initial/config.js'
+import appConfig  from './config.js'
 import { StorageKey, HttpStatusCode } from '../enums/index.js'
-import Message from '../initial/message.js'
+import Message from './message.js'
 
 export enum HttpMethods {
     GET = 'GET',
@@ -18,31 +18,31 @@ class Request {
         this.timeout = timeout
         this.responseHandler = responseHandler
     }
-
     send<T>(url: string, method: HttpMethods, options = {} as fetchOptio & RequestInit, done?: <K>(data: K)=> void): Promise<T> {
         const controller = new AbortController();
         const signal = controller.signal;
         const req = fetch(`${this.baseUrl}${url}`, {
-            method: HttpMethods.POST,
+            method: method,
             ...Object.assign(this.config, options, {signal})
         })
+    
         const sleep = new Promise<Response>((resolve) => {
             const result:ResponseProps<{}> = {
                 code: HttpStatusCode.Timeout,
                 msg: '请求超时',
                 data: {},
                 errInfo: ''
-            } 
+            }
             let val = new Response(JSON.stringify(result))
             setTimeout(resolve, this.timeout, val);
         });
         return Promise.race([req, sleep]).then((resp) => {
-            const response = resp.json()
+            const response = resp.json() as Promise<T>
             response.then(res=>{
                 this.responseHandler && this.responseHandler(res, options, controller, done)
             })
             return response
-        });
+        })
     }
     get<T>(url: string, options = {} as fetchOptio & RequestInit, done?: <K>(data: K)=> void): Promise<T> {
         return this.send<T>(url, HttpMethods.GET, options, done)
@@ -57,7 +57,7 @@ const fetcherResponse = <T>(res: ResponseProps<T>, config:fetchOptio, controller
     if(res.code !== HttpStatusCode.OK){
         // 通用异常处理
         if(!config?.hideErrMsg){
-            new Message({content: res.msg, type: 'error', duration:2000})
+            new Message({content: res.msg, type: 'error', duration:20000000})
         }
     } 
     if(res.code === HttpStatusCode.Unauthorized){

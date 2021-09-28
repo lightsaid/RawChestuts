@@ -1,4 +1,4 @@
-import { fetcher } from './fetcher.js';
+import { fetcher } from '../initial/fetcher.js';
 var UserServerApi = /** @class */ (function () {
     function UserServerApi() {
     }

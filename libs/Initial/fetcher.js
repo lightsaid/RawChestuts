@@ -9,9 +9,9 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import appConfig from '../initial/config.js';
+import appConfig from './config.js';
 import { StorageKey, HttpStatusCode } from '../enums/index.js';
-import Message from '../initial/message.js';
+import Message from './message.js';
 export var HttpMethods;
 (function (HttpMethods) {
     HttpMethods["GET"] = "GET";
@@ -31,7 +31,7 @@ var Request = /** @class */ (function () {
         if (options === void 0) { options = {}; }
         var controller = new AbortController();
         var signal = controller.signal;
-        var req = fetch("" + this.baseUrl + url, __assign({ method: HttpMethods.POST }, Object.assign(this.config, options, { signal: signal })));
+        var req = fetch("" + this.baseUrl + url, __assign({ method: method }, Object.assign(this.config, options, { signal: signal })));
         var sleep = new Promise(function (resolve) {
             var result = {
                 code: HttpStatusCode.Timeout,

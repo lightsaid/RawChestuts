@@ -45,6 +45,7 @@ var Message = /** @class */ (function () {
     // 创建实例
     Message.prototype.created = function () {
         this.instance = document.createElement("div");
+        this.instance.classList.add("raw-message-notice");
         var icon = document.createElement("span");
         var content = document.createElement("span");
         icon.classList.add("iconfont");

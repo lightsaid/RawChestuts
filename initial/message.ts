@@ -70,6 +70,7 @@ export default class Message {
     // 创建实例
     private created(): IceDivInstance{
         this.instance = document.createElement("div")
+        this.instance.classList.add("raw-message-notice")
         var icon = document.createElement("span")
         var content = document.createElement("span")
         icon.classList.add("iconfont")
